@@ -10,7 +10,7 @@ type errorGroup struct {
 	errors []error
 }
 
-func (eg *errorGroup) AddError(err error) {
+func (eg *errorGroup) Add(err error) {
 	if err == nil {
 		return
 	}
@@ -22,21 +22,7 @@ func (eg *errorGroup) AddError(err error) {
 	return
 }
 
-func (eg *errorGroup) GetLast() error {
-	eg.mutex.Lock()
-	defer eg.mutex.Unlock()
-
-	return eg.errors[len(eg.errors)-1]
-}
-
-func (eg *errorGroup) GetFirst() error {
-	eg.mutex.Lock()
-	defer eg.mutex.Unlock()
-
-	return eg.errors[0]
-}
-
-func (eg *errorGroup) GetAll() []error {
+func (eg *errorGroup) All() []error {
 	eg.mutex.Lock()
 	defer eg.mutex.Unlock()
 
@@ -54,16 +40,35 @@ func (eg *errorGroup) Error() string {
 		sb.WriteString("\n")
 	}
 
-	return sb.String()
+	return strings.TrimSuffix(sb.String(), "\n")
+}
+
+func (eg *errorGroup) First() error {
+	eg.mutex.Lock()
+	defer eg.mutex.Unlock()
+
+	return eg.errors[0]
+}
+
+func (eg *errorGroup) Last() error {
+	eg.mutex.Lock()
+	defer eg.mutex.Unlock()
+
+	return eg.errors[len(eg.errors)-1]
+}
+
+func (eg *errorGroup) Len() int {
+	eg.mutex.Lock()
+	defer eg.mutex.Unlock()
+
+	return len(eg.errors)
 }
 
 //goland:noinspection GoExportedFuncWithUnexportedType
 func NewErrorGroup() *errorGroup {
 	errorMutex := sync.Mutex{}
-	var multiErrors []error // TODO(Canavan): check if this is necessary
 
 	return &errorGroup{
-		mutex:  &errorMutex,
-		errors: multiErrors,
+		mutex: &errorMutex,
 	}
 }
