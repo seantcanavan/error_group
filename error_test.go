@@ -31,12 +31,12 @@ func TestErrorGroup_Add(t *testing.T) {
 
 	wg.Wait()
 
-	t.Run("verify all values were added successfully", func(t *testing.T) {
+	t.Run("verify all errors were added successfully", func(t *testing.T) {
 		assert.Equal(t, eg.Len(), numToAdd)
 	})
 }
 
-func TestErrorGroup_ErrorGroup_All(t *testing.T) {
+func TestErrorGroup_All(t *testing.T) {
 	firstMessage := "first message"
 	lastMessage := "last message"
 	middleMessage := "middle message"
@@ -64,6 +64,9 @@ func TestErrorGroup_ErrorGroup_All(t *testing.T) {
 		for i := 1; i < len(allErrors)-1; i++ {
 			assert.Equal(t, middleMessage, allErrors[i].Error())
 		}
+	})
+	t.Run("verify slice returned is not modified by add", func(t *testing.T) {
+		assert.True(t, false)
 	})
 }
 

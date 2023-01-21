@@ -151,6 +151,20 @@ func (esg *errorStatusGroup) LastStatus() int {
 	return esg.statuses[len(esg.statuses)-1]
 }
 
+func (esg *errorStatusGroup) LenErrors() int {
+	esg.errorsMutex.Lock()
+	defer esg.errorsMutex.Unlock()
+
+	return len(esg.errors)
+}
+
+func (esg *errorStatusGroup) LenStatuses() int {
+	esg.statusesMutex.Lock()
+	defer esg.statusesMutex.Unlock()
+
+	return len(esg.statuses)
+}
+
 func (esg *errorStatusGroup) LowestStatus() int {
 	esg.statusesMutex.Lock()
 	defer esg.statusesMutex.Unlock()
