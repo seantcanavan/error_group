@@ -1,6 +1,7 @@
 package error_group
 
 import (
+	"errors"
 	"strings"
 	"sync"
 )
@@ -8,6 +9,15 @@ import (
 type errorGroup struct {
 	mutex  *sync.Mutex
 	errors []error
+}
+
+//goland:noinspection GoExportedFuncWithUnexportedType
+func NewErrorGroup() *errorGroup {
+	errorMutex := sync.Mutex{}
+
+	return &errorGroup{
+		mutex: &errorMutex,
+	}
 }
 
 func (eg *errorGroup) Add(err error) {
@@ -32,6 +42,10 @@ func (eg *errorGroup) All() []error {
 func (eg *errorGroup) Error() string {
 	eg.mutex.Lock()
 	defer eg.mutex.Unlock()
+
+	if len(eg.errors) == 0 {
+		return ""
+	}
 
 	sb := strings.Builder{}
 
@@ -64,11 +78,6 @@ func (eg *errorGroup) Len() int {
 	return len(eg.errors)
 }
 
-//goland:noinspection GoExportedFuncWithUnexportedType
-func NewErrorGroup() *errorGroup {
-	errorMutex := sync.Mutex{}
-
-	return &errorGroup{
-		mutex: &errorMutex,
-	}
+func (eg *errorGroup) ToError() error {
+	return errors.New(eg.Error())
 }

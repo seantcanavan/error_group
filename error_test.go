@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/jgroeneveld/trial/assert"
 	"math/rand"
+	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -113,6 +114,20 @@ func TestLen(t *testing.T) {
 
 	t.Run("verify Len returns correct value", func(t *testing.T) {
 		assert.Equal(t, toAdd, eg.Len())
+	})
+}
+
+func TestToError(t *testing.T) {
+	eg := NewErrorGroup()
+
+	first := "first message"
+	last := "last message"
+
+	eg.Add(errors.New(first))
+	eg.Add(errors.New(last))
+
+	t.Run("verify toError", func(t *testing.T) {
+		assert.True(t, reflect.DeepEqual(errors.New(eg.Error()), eg.ToError().Error()))
 	})
 }
 

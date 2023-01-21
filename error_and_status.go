@@ -2,114 +2,156 @@ package error_group
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 )
 
 type errorStatusGroup struct {
-	errorMutex    *sync.Mutex
-	firstError    error
-	firstStatus   int
+	errors        []error
+	errorsMutex   *sync.Mutex
 	highestStatus int
-	lastError     error
-	lastStatus    int
 	lowestStatus  int
-	multiErrors   []error
-	multiStatuses []int
-	statusMutex   *sync.Mutex
+	statuses      []int
+	statusesMutex *sync.Mutex
 }
 
 //goland:noinspection GoExportedFuncWithUnexportedType
 func NewErrorStatusGroup() *errorStatusGroup {
 	errorMutex := sync.Mutex{}
 	statusMutex := sync.Mutex{}
-	var multiErrors []error
-	var multiStatuses []int
 
 	return &errorStatusGroup{
-		errorMutex:    &errorMutex,
-		multiErrors:   multiErrors,
-		multiStatuses: multiStatuses,
-		statusMutex:   &statusMutex,
+		errorsMutex:   &errorMutex,
+		statusesMutex: &statusMutex,
 	}
 }
 
-func (m *errorStatusGroup) AddError(err error) {
+func (esg *errorStatusGroup) AddError(err error) {
 	if err == nil {
 		return
 	}
 
-	m.errorMutex.Lock()
-	defer m.errorMutex.Unlock()
+	esg.errorsMutex.Lock()
+	defer esg.errorsMutex.Unlock()
 
-	m.multiErrors = append(m.multiErrors, err)
-	return
+	esg.errors = append(esg.errors, err)
 }
 
-func (m *errorStatusGroup) AddStatus(httpStatus int) {
-	// don't take up the lock for a 0 value or 200 value - they're both default / okay
-	if httpStatus == 0 || httpStatus == 200 {
-		return
+func (esg *errorStatusGroup) AddStatus(status int) {
+	esg.statusesMutex.Lock()
+	defer esg.statusesMutex.Unlock()
+
+	if status < esg.lowestStatus {
+		esg.lowestStatus = status
 	}
 
-	m.statusMutex.Lock()
-	defer m.statusMutex.Unlock()
+	if status > esg.highestStatus {
+		esg.highestStatus = status
+	}
 
-	m.multiStatuses = append(m.multiStatuses, httpStatus)
-	return
+	esg.statuses = append(esg.statuses, status)
 }
 
-func (m *errorStatusGroup) AddStatusAndError(httpStatus int, err error) {
+func (esg *errorStatusGroup) AddStatusAndError(status int, err error) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
 	go func() {
-		m.AddStatus(httpStatus)
+		esg.AddStatus(status)
 		wg.Done()
 	}()
 
 	go func() {
-		m.AddError(err)
+		esg.AddError(err)
 		wg.Done()
 	}()
 
 	wg.Wait()
-	return
 }
 
-func (m *errorStatusGroup) Error() error {
-	m.errorMutex.Lock()
-	defer m.errorMutex.Unlock()
-
-	if len(m.multiErrors) == 0 {
-		return nil
-	}
+func (esg *errorStatusGroup) Error() string {
+	esg.errorsMutex.Lock()
+	esg.statusesMutex.Lock()
+	defer esg.errorsMutex.Unlock()
+	defer esg.statusesMutex.Unlock()
 
 	sb := strings.Builder{}
 
-	for _, currentError := range m.multiErrors {
+	sb.WriteString(fmt.Sprintf("lowest status: [%d]", esg.lowestStatus))
+	sb.WriteString("\n")
+	sb.WriteString(fmt.Sprintf("highest status: [%d]", esg.highestStatus))
+	sb.WriteString("\n")
+
+	for _, currentError := range esg.errors {
 		sb.WriteString(currentError.Error())
 		sb.WriteString("\n")
 	}
 
-	return errors.New(sb.String())
+	return strings.TrimSuffix(sb.String(), "\n")
 }
 
-func (m *errorStatusGroup) Status() int {
-	m.statusMutex.Lock()
-	defer m.statusMutex.Unlock()
+func (esg *errorStatusGroup) FirstError() error {
+	esg.errorsMutex.Lock()
+	defer esg.errorsMutex.Unlock()
 
-	high := 200 // if no errors happened, then 200 happened!
-
-	for _, currentStatus := range m.multiStatuses {
-		if currentStatus > high {
-			high = currentStatus
-		}
-	}
-
-	return high
+	return esg.errors[0]
 }
 
-func (m *errorStatusGroup) StatusAndError() (int, error) {
-	return m.Status(), m.Error()
+func (esg *errorStatusGroup) FirstStatus() int {
+	esg.statusesMutex.Lock()
+	defer esg.statusesMutex.Unlock()
+
+	return esg.statuses[0]
+}
+
+func (esg *errorStatusGroup) HighestStatus() int {
+	esg.statusesMutex.Lock()
+	defer esg.statusesMutex.Unlock()
+
+	return esg.highestStatus
+}
+
+func (esg *errorStatusGroup) LastError() error {
+	esg.errorsMutex.Lock()
+	defer esg.errorsMutex.Unlock()
+
+	return esg.errors[len(esg.errors)-1]
+}
+
+func (esg *errorStatusGroup) LastStatus() int {
+	esg.statusesMutex.Lock()
+	defer esg.statusesMutex.Unlock()
+
+	return esg.statuses[len(esg.statuses)-1]
+}
+
+func (esg *errorStatusGroup) LowestStatus() int {
+	esg.statusesMutex.Lock()
+	defer esg.statusesMutex.Unlock()
+
+	return esg.lowestStatus
+}
+
+func (esg *errorStatusGroup) ToError() error {
+	return errors.New(esg.Error())
+}
+
+func (esg *errorStatusGroup) StatusAndToError() (int, error) {
+	var wg sync.WaitGroup
+	var highestStatus int
+	var err error
+	wg.Add(2)
+
+	go func() {
+		highestStatus = esg.HighestStatus()
+		wg.Done()
+	}()
+
+	go func() {
+		err = esg.ToError()
+		wg.Done()
+	}()
+
+	return highestStatus, err
 }
