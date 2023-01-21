@@ -1,52 +1,58 @@
 package error_group
 
 import (
-	"errors"
 	"github.com/jgroeneveld/trial/assert"
-	"net/http"
-	"strings"
 	"testing"
 )
 
-func TestErrorAndAddError(t *testing.T) {
-	multiError := NewErrorStatusGroup()
-
-	firstError := "first error"
-	multiError.AddError(errors.New(firstError))
-	assert.True(t, strings.Contains(multiError.Error().Error(), firstError))
-
-	secondError := "second error"
-	multiError.AddError(errors.New(secondError))
-	assert.True(t, strings.Contains(multiError.Error().Error(), secondError))
+func TestErrorStatusGroup_AddError(t *testing.T) {
+	assert.True(t, false)
 }
 
-func TestStatusAndAddStatus(t *testing.T) {
-	multiError := NewErrorStatusGroup()
-
-	multiError.AddStatus(http.StatusOK)
-	assert.Equal(t, multiError.Status(), http.StatusOK)
-	multiError.AddStatus(http.StatusConflict)
-	assert.Equal(t, multiError.Status(), http.StatusConflict)
-	multiError.AddStatus(http.StatusCreated)
-	assert.Equal(t, multiError.Status(), http.StatusConflict)
+func TestErrorStatusGroup_AddStatus(t *testing.T) {
+	assert.True(t, false)
 }
 
-func TestAddStatusAndError(t *testing.T) {
-	multiError := NewErrorStatusGroup()
+func TestErrorStatusGroup_AddStatusAndError(t *testing.T) {
+	assert.True(t, false)
+}
 
-	firstError := "first error"
-	multiError.AddStatusAndError(http.StatusAlreadyReported, errors.New(firstError))
+func TestErrorStatusGroup_All(t *testing.T) {
+	assert.True(t, false)
+}
 
-	assert.True(t, strings.Contains(multiError.Error().Error(), firstError))
-	assert.Equal(t, multiError.Status(), http.StatusAlreadyReported)
+func TestErrorStatusGroup_Error(t *testing.T) {
+	assert.True(t, false)
+}
 
-	secondError := "second error"
-	multiError.AddStatusAndError(http.StatusOK, errors.New(secondError))
+func TestErrorStatusGroup_FirstError(t *testing.T) {
+	assert.True(t, false)
+}
 
-	assert.True(t, strings.Contains(multiError.Error().Error(), secondError))
-	assert.Equal(t, multiError.Status(), http.StatusAlreadyReported)
+func TestErrorStatusGroup_FirstStatus(t *testing.T) {
+	assert.True(t, false)
+}
 
-	multiError.AddStatusAndError(http.StatusInternalServerError, nil)
+func TestErrorStatusGroup_HighestStatus(t *testing.T) {
+	assert.True(t, false)
+}
 
-	assert.Equal(t, multiError.Status(), http.StatusInternalServerError)
+func TestErrorStatusGroup_LastError(t *testing.T) {
+	assert.True(t, false)
+}
+
+func TestErrorStatusGroup_LastStatus(t *testing.T) {
+	assert.True(t, false)
+}
+
+func TestErrorStatusGroup_LowestStatus(t *testing.T) {
+	assert.True(t, false)
+}
+
+func TestErrorStatusGroup_ToStatusAndError(t *testing.T) {
+	assert.True(t, false)
+}
+
+func TestErrorStatusGroup_ToError(t *testing.T) {
+	assert.True(t, false)
 }

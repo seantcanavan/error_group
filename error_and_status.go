@@ -70,6 +70,31 @@ func (esg *errorStatusGroup) AddStatusAndError(status int, err error) {
 	wg.Wait()
 }
 
+func (esg *errorStatusGroup) All() ([]int, []error) {
+	esg.errorsMutex.Lock()
+	esg.statusesMutex.Lock()
+	defer esg.errorsMutex.Unlock()
+	defer esg.statusesMutex.Unlock()
+
+	dupErrors := make([]error, len(esg.errors))
+	dupStatuses := make([]int, len(esg.statuses))
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		copy(dupErrors, esg.errors)
+	}()
+
+	go func() {
+		copy(dupStatuses, esg.statuses)
+	}()
+
+	wg.Wait()
+
+	return dupStatuses, dupErrors
+}
+
 func (esg *errorStatusGroup) Error() string {
 	esg.errorsMutex.Lock()
 	esg.statusesMutex.Lock()
@@ -133,11 +158,7 @@ func (esg *errorStatusGroup) LowestStatus() int {
 	return esg.lowestStatus
 }
 
-func (esg *errorStatusGroup) ToError() error {
-	return errors.New(esg.Error())
-}
-
-func (esg *errorStatusGroup) StatusAndToError() (int, error) {
+func (esg *errorStatusGroup) ToStatusAndError() (int, error) {
 	var wg sync.WaitGroup
 	var highestStatus int
 	var err error
@@ -154,4 +175,8 @@ func (esg *errorStatusGroup) StatusAndToError() (int, error) {
 	}()
 
 	return highestStatus, err
+}
+
+func (esg *errorStatusGroup) ToError() error {
+	return errors.New(esg.Error())
 }

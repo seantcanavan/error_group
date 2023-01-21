@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestAdd(t *testing.T) {
+func TestErrorGroup_Add(t *testing.T) {
 	eg := NewErrorGroup()
 
 	var wg sync.WaitGroup
@@ -36,7 +36,7 @@ func TestAdd(t *testing.T) {
 	})
 }
 
-func TestAll(t *testing.T) {
+func TestErrorGroup_ErrorGroup_All(t *testing.T) {
 	firstMessage := "first message"
 	lastMessage := "last message"
 	middleMessage := "middle message"
@@ -67,7 +67,7 @@ func TestAll(t *testing.T) {
 	})
 }
 
-func TestError(t *testing.T) {
+func TestErrorGroup_Error(t *testing.T) {
 	eg := NewErrorGroup()
 	first := "first message"
 	last := "last message"
@@ -79,7 +79,7 @@ func TestError(t *testing.T) {
 	assert.Equal(t, strings.Join([]string{first, last}, "\n"), errString)
 }
 
-func TestFirst(t *testing.T) {
+func TestErrorGroup_First(t *testing.T) {
 	eg := NewErrorGroup()
 	first := "first message"
 	last := "last message"
@@ -92,7 +92,7 @@ func TestFirst(t *testing.T) {
 	})
 }
 
-func TestLast(t *testing.T) {
+func TestErrorGroup_Last(t *testing.T) {
 	eg := NewErrorGroup()
 	first := "first message"
 	last := "last message"
@@ -105,7 +105,7 @@ func TestLast(t *testing.T) {
 	})
 }
 
-func TestLen(t *testing.T) {
+func TestErrorGroup_Len(t *testing.T) {
 	eg := NewErrorGroup()
 	toAdd := 10
 	for i := 0; i < toAdd; i++ {
@@ -117,7 +117,7 @@ func TestLen(t *testing.T) {
 	})
 }
 
-func TestToError(t *testing.T) {
+func TestErrorGroup_ToError(t *testing.T) {
 	eg := NewErrorGroup()
 
 	first := "first message"

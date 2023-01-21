@@ -36,7 +36,11 @@ func (eg *errorGroup) All() []error {
 	eg.mutex.Lock()
 	defer eg.mutex.Unlock()
 
-	return eg.errors
+	duplicate := make([]error, len(eg.errors))
+
+	copy(duplicate, eg.errors)
+
+	return duplicate
 }
 
 func (eg *errorGroup) Error() string {
