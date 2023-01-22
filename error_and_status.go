@@ -119,6 +119,10 @@ func (esg *errorStatusGroup) Error() string {
 	defer esg.errorsMutex.Unlock()
 	defer esg.statusesMutex.Unlock()
 
+	if len(esg.errors) < 1 {
+		return ""
+	}
+
 	sb := strings.Builder{}
 
 	sb.WriteString(fmt.Sprintf("lowest status: [%d]", esg.lowestStatus))
@@ -236,5 +240,9 @@ func (esg *errorStatusGroup) ToStatusAndError() (int, error) {
 // in this error status group into one single error. This is useful for returning the ErrorStatusGroup
 // object instance as a single generic builtin.Error interface instance.
 func (esg *errorStatusGroup) ToError() error {
-	return errors.New(esg.Error())
+	errMessage := esg.Error()
+	if errMessage == "" {
+		return nil
+	}
+	return errors.New(errMessage)
 }

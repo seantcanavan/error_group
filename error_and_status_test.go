@@ -214,7 +214,10 @@ func TestErrorStatusGroup_Error(t *testing.T) {
 
 		assert.Equal(t, sb.String(), esg.Error())
 	})
-
+	t.Run("verify Error() returns the empty string when there are no errors", func(t *testing.T) {
+		other := NewErrorStatusGroup()
+		assert.Equal(t, "", other.Error())
+	})
 }
 
 func TestErrorStatusGroup_FirstError(t *testing.T) {
@@ -415,6 +418,10 @@ func TestErrorStatusGroup_ToError(t *testing.T) {
 		errString := esg.ToError().Error()
 
 		assert.Equal(t, sb.String(), errString)
+	})
+	t.Run("verify ToError() returns nil when there are no errors", func(t *testing.T) {
+		other := NewErrorStatusGroup()
+		assert.Nil(t, other.ToError())
 	})
 }
 

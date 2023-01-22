@@ -52,14 +52,16 @@ func GlobalSearch(ctx context.Context, gReq *GlobalSearchReq) (*GlobalSearchRes,
 	}()
 
 	go func() {
-		getTeachers, getTeachersHttpStatus, getTeachersErr := teacher.Search(ctx, &teacher.SearchReq{})
+		getTeachers, getTeachersHttpStatus, getTeachersErr := teacher.Search(ctx, &teacher.SearchReq{...})
 		esg.AddStatusAndError(getTeachersHttpStatus, getTeachersErr)
-		Teachers = getTeachers
+		teachers = getTeachers
 		wg.Done()
 	}()
 
 	wg.Wait()
 
+    // If no errors are encountered, esg.ToError() returns nil as expected to indiciate to the caller all is good
+    // esg.HighestStatus will return 200 if no errors occurred and previous functions returned 200 OK
 	return &GlobalSearchRes{
 		Admins:      admins,
 		Users:       users,
@@ -71,16 +73,17 @@ func GlobalSearch(ctx context.Context, gReq *GlobalSearchReq) (*GlobalSearchRes,
 
 ## All tests are passing
 ```
+Sat Jan 21 11:47 PM error_group: make test
 go test -v
 === RUN   TestErrorStatusGroupMultipleThreads
 === RUN   TestErrorStatusGroupMultipleThreads/verify_the_number_of_status_values_is_correct
 === RUN   TestErrorStatusGroupMultipleThreads/verify_the_number_of_error_values_is_correct
---- PASS: TestErrorStatusGroupMultipleThreads (1.83s)
+--- PASS: TestErrorStatusGroupMultipleThreads (1.79s)
     --- PASS: TestErrorStatusGroupMultipleThreads/verify_the_number_of_status_values_is_correct (0.00s)
     --- PASS: TestErrorStatusGroupMultipleThreads/verify_the_number_of_error_values_is_correct (0.00s)
 === RUN   TestErrorStatusGroup_AddError
 === RUN   TestErrorStatusGroup_AddError/verify_AddError()_correctly_added_all_errors
---- PASS: TestErrorStatusGroup_AddError (0.87s)
+--- PASS: TestErrorStatusGroup_AddError (0.86s)
     --- PASS: TestErrorStatusGroup_AddError/verify_AddError()_correctly_added_all_errors (0.00s)
 === RUN   TestErrorStatusGroup_AddStatus
 === RUN   TestErrorStatusGroup_AddStatus/verify_all_status_values_were_added_via_AddStatus()_and_check_with_LenStatuses()
@@ -89,7 +92,7 @@ go test -v
 === RUN   TestErrorStatusGroup_AddStatusAndError
 === RUN   TestErrorStatusGroup_AddStatusAndError/verify_all_values_were_added_via_AddStatusAndError()_and_check_with_LenErrors()
 === RUN   TestErrorStatusGroup_AddStatusAndError/verify_all_values_were_added_via_AddStatusAndError()_and_check_with_LenStatuses()
---- PASS: TestErrorStatusGroup_AddStatusAndError (0.92s)
+--- PASS: TestErrorStatusGroup_AddStatusAndError (0.91s)
     --- PASS: TestErrorStatusGroup_AddStatusAndError/verify_all_values_were_added_via_AddStatusAndError()_and_check_with_LenErrors() (0.00s)
     --- PASS: TestErrorStatusGroup_AddStatusAndError/verify_all_values_were_added_via_AddStatusAndError()_and_check_with_LenStatuses() (0.00s)
 === RUN   TestErrorStatusGroup_All
@@ -104,8 +107,10 @@ go test -v
     --- PASS: TestErrorStatusGroup_All/verify_slice_returned_by_All()_is_not_affected_by_more_calls_to_AddStatus() (0.00s)
 === RUN   TestErrorStatusGroup_Error
 === RUN   TestErrorStatusGroup_Error/verify_output_of_Error()_is_correct
+=== RUN   TestErrorStatusGroup_Error/verify_Error()_returns_the_empty_string_when_there_are_no_errors
 --- PASS: TestErrorStatusGroup_Error (0.00s)
     --- PASS: TestErrorStatusGroup_Error/verify_output_of_Error()_is_correct (0.00s)
+    --- PASS: TestErrorStatusGroup_Error/verify_Error()_returns_the_empty_string_when_there_are_no_errors (0.00s)
 === RUN   TestErrorStatusGroup_FirstError
 === RUN   TestErrorStatusGroup_FirstError/verify_FirstError()_returns_the_correct_error_value
 --- PASS: TestErrorStatusGroup_FirstError (0.00s)
@@ -136,11 +141,13 @@ go test -v
     --- PASS: TestErrorStatusGroup_ToStatusAndError/verify_output_of_ToStatusAndError()_is_correct (0.00s)
 === RUN   TestErrorStatusGroup_ToError
 === RUN   TestErrorStatusGroup_ToError/verify_output_of_ToError()_is_correct
+=== RUN   TestErrorStatusGroup_ToError/verify_ToError()_returns_nil_when_there_are_no_errors
 --- PASS: TestErrorStatusGroup_ToError (0.00s)
     --- PASS: TestErrorStatusGroup_ToError/verify_output_of_ToError()_is_correct (0.00s)
+    --- PASS: TestErrorStatusGroup_ToError/verify_ToError()_returns_nil_when_there_are_no_errors (0.00s)
 === RUN   TestErrorGroup_Add
 === RUN   TestErrorGroup_Add/verify_Add()_operations_were_successful_and_Len()_returns_correct_value
---- PASS: TestErrorGroup_Add (0.87s)
+--- PASS: TestErrorGroup_Add (0.86s)
     --- PASS: TestErrorGroup_Add/verify_Add()_operations_were_successful_and_Len()_returns_correct_value (0.00s)
 === RUN   TestErrorGroup_All
 === RUN   TestErrorGroup_All/verify_All()_returns_the_correct_first_error_message
@@ -154,8 +161,10 @@ go test -v
     --- PASS: TestErrorGroup_All/verify_All()_returns_a_new_slice_that_is_not_affected_by_Add() (0.00s)
 === RUN   TestErrorGroup_Error
 === RUN   TestErrorGroup_Error/verify_Error()_returns_a_correctly_formatted_error_string
+=== RUN   TestErrorGroup_Error/verify_Error()_returns_the_empty_string_when_there_are_no_errors
 --- PASS: TestErrorGroup_Error (0.00s)
     --- PASS: TestErrorGroup_Error/verify_Error()_returns_a_correctly_formatted_error_string (0.00s)
+    --- PASS: TestErrorGroup_Error/verify_Error()_returns_the_empty_string_when_there_are_no_errors (0.00s)
 === RUN   TestErrorGroup_First
 === RUN   TestErrorGroup_First/verify_First()_returns_the_correct_error_string
 --- PASS: TestErrorGroup_First (0.00s)
@@ -170,8 +179,10 @@ go test -v
     --- PASS: TestErrorGroup_Len/verify_Len()_returns_the_correct_number_of_errors (0.00s)
 === RUN   TestErrorGroup_ToError
 === RUN   TestErrorGroup_ToError/verify_ToError()_returns_the_correctly_formatted_error_message
+=== RUN   TestErrorGroup_ToError/verify_ToError()_returns_nil_when_there_are_no_errors
 --- PASS: TestErrorGroup_ToError (0.00s)
     --- PASS: TestErrorGroup_ToError/verify_ToError()_returns_the_correctly_formatted_error_message (0.00s)
+    --- PASS: TestErrorGroup_ToError/verify_ToError()_returns_nil_when_there_are_no_errors (0.00s)
 PASS
-ok  	github.com/seantcanavan/error_group	4.557s
+ok  	github.com/seantcanavan/error_group	4.488s
 ```

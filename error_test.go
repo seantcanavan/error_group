@@ -83,6 +83,10 @@ func TestErrorGroup_Error(t *testing.T) {
 		errString := eg.Error()
 		assert.Equal(t, strings.Join([]string{first, last}, "\n"), errString)
 	})
+	t.Run("verify Error() returns the empty string when there are no errors", func(t *testing.T) {
+		other := NewErrorGroup()
+		assert.Equal(t, "", other.Error())
+	})
 }
 
 func TestErrorGroup_First(t *testing.T) {
@@ -134,6 +138,10 @@ func TestErrorGroup_ToError(t *testing.T) {
 
 	t.Run("verify ToError() returns the correctly formatted error message", func(t *testing.T) {
 		assert.True(t, reflect.DeepEqual(errors.New(eg.Error()), eg.ToError()))
+	})
+	t.Run("verify ToError() returns nil when there are no errors", func(t *testing.T) {
+		other := NewErrorGroup()
+		assert.Nil(t, other.ToError())
 	})
 }
 

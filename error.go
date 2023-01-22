@@ -96,5 +96,10 @@ func (eg *errorGroup) Len() int {
 // error group into one single error. This is useful for returning the ErrorGroup
 // object instance as a single generic builtin.Error interface instance.
 func (eg *errorGroup) ToError() error {
-	return errors.New(eg.Error())
+	errMessage := eg.Error()
+	if errMessage == "" {
+		return nil
+	}
+
+	return errors.New(errMessage)
 }
