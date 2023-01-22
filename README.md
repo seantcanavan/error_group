@@ -12,7 +12,7 @@ When working with HTTP status codes you can request the highest status value in 
 ## How to Use
 1. `go get github.com/seantcanavan/error_group@latest`
 2. `import github.com/seantcanavan/error_group`
-3. Initialize a new ErrorGroup `eg := NewErrorGroup` or ErrorAndStatusGroup `esg := NewErrorAndStatusGroup`
+3. Initialize a new ErrorGroup `eg := error_group.NewErrorGroup` or ErrorAndStatusGroup `esg := error_group.NewErrorAndStatusGroup`
 4. Create a wait group to start working in parallel `var wg sync.WaitGroup`
 5. Perform work in parallel `go func() { eg.AddError(parallelWork())}()`
 6. Return a combined error when done `return eg.Error()`
