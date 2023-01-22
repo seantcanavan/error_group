@@ -31,7 +31,7 @@ func TestErrorGroup_Add(t *testing.T) {
 
 	wg.Wait()
 
-	t.Run("verify all errors were added successfully", func(t *testing.T) {
+	t.Run("verify Add() operations were successful and Len() returns correct value", func(t *testing.T) {
 		assert.Equal(t, eg.Len(), numToAdd)
 	})
 }
@@ -53,20 +53,21 @@ func TestErrorGroup_All(t *testing.T) {
 
 	allErrors := eg.All()
 
-	t.Run("verify first message is correct", func(t *testing.T) {
+	t.Run("verify All() returns the correct first error message", func(t *testing.T) {
 		assert.Equal(t, firstMessage, allErrors[0].Error())
 
 	})
-	t.Run("verify middle messages are correct", func(t *testing.T) {
+	t.Run("verify All() returns the correct middle messages", func(t *testing.T) {
 		assert.Equal(t, lastMessage, allErrors[len(allErrors)-1].Error())
 	})
-	t.Run("verify last message is correct", func(t *testing.T) {
+	t.Run("verify All() returns the correct last message", func(t *testing.T) {
 		for i := 1; i < len(allErrors)-1; i++ {
 			assert.Equal(t, middleMessage, allErrors[i].Error())
 		}
 	})
-	t.Run("verify slice returned is not modified by add", func(t *testing.T) {
-		assert.True(t, false)
+	t.Run("verify All() returns a new slice that is not affected by Add()", func(t *testing.T) {
+		eg.Add(errors.New(generateRandomString(10)))
+		assert.Equal(t, len(allErrors), 12)
 	})
 }
 
@@ -78,8 +79,10 @@ func TestErrorGroup_Error(t *testing.T) {
 	eg.Add(errors.New(first))
 	eg.Add(errors.New(last))
 
-	errString := eg.Error()
-	assert.Equal(t, strings.Join([]string{first, last}, "\n"), errString)
+	t.Run("verify Error() returns a correctly formatted error string", func(t *testing.T) {
+		errString := eg.Error()
+		assert.Equal(t, strings.Join([]string{first, last}, "\n"), errString)
+	})
 }
 
 func TestErrorGroup_First(t *testing.T) {
@@ -90,7 +93,7 @@ func TestErrorGroup_First(t *testing.T) {
 	eg.Add(errors.New(first))
 	eg.Add(errors.New(last))
 
-	t.Run("verify first", func(t *testing.T) {
+	t.Run("verify First() returns the correct error string", func(t *testing.T) {
 		assert.Equal(t, first, eg.First().Error())
 	})
 }
@@ -103,7 +106,7 @@ func TestErrorGroup_Last(t *testing.T) {
 	eg.Add(errors.New(first))
 	eg.Add(errors.New(last))
 
-	t.Run("verify last", func(t *testing.T) {
+	t.Run("verify Last() returns the correct error string", func(t *testing.T) {
 		assert.Equal(t, last, eg.Last().Error())
 	})
 }
@@ -115,7 +118,7 @@ func TestErrorGroup_Len(t *testing.T) {
 		eg.Add(errors.New(generateRandomString(10)))
 	}
 
-	t.Run("verify Len returns correct value", func(t *testing.T) {
+	t.Run("verify Len() returns the correct number of errors", func(t *testing.T) {
 		assert.Equal(t, toAdd, eg.Len())
 	})
 }
@@ -129,8 +132,8 @@ func TestErrorGroup_ToError(t *testing.T) {
 	eg.Add(errors.New(first))
 	eg.Add(errors.New(last))
 
-	t.Run("verify toError", func(t *testing.T) {
-		assert.True(t, reflect.DeepEqual(errors.New(eg.Error()), eg.ToError().Error()))
+	t.Run("verify ToError() returns the correctly formatted error message", func(t *testing.T) {
+		assert.True(t, reflect.DeepEqual(errors.New(eg.Error()), eg.ToError()))
 	})
 }
 
