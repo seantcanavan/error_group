@@ -151,14 +151,14 @@ func TestErrorStatusGroup_All(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	allStatuses, allErrors := esg.All()
 
@@ -184,20 +184,20 @@ func TestErrorStatusGroup_Error(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify output of Error() is correct", func(t *testing.T) {
 		var sb strings.Builder
-		sb.WriteString(fmt.Sprintf("lowest status: [%d]", 1))
+		sb.WriteString(fmt.Sprintf("lowest status: [%d]", 100))
 		sb.WriteString("\n")
-		sb.WriteString(fmt.Sprintf("highest status: [%d]", 3))
+		sb.WriteString(fmt.Sprintf("highest status: [%d]", 300))
 		sb.WriteString("\n")
 
 		var stringsToConcat []string
@@ -226,14 +226,14 @@ func TestErrorStatusGroup_FirstError(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify FirstError() returns the correct error value", func(t *testing.T) {
 		assert.Equal(t, esg.FirstError().Error(), firstMessage)
@@ -246,17 +246,17 @@ func TestErrorStatusGroup_FirstStatus(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify FirstStatus() returns the correct status value", func(t *testing.T) {
-		assert.Equal(t, esg.FirstStatus(), 1)
+		assert.Equal(t, esg.FirstStatus(), 100)
 	})
 }
 
@@ -266,17 +266,17 @@ func TestErrorStatusGroup_HighestStatus(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify HighestStatus() returns the correct status value", func(t *testing.T) {
-		assert.Equal(t, 3, esg.HighestStatus())
+		assert.Equal(t, 300, esg.HighestStatus())
 	})
 }
 
@@ -286,14 +286,14 @@ func TestErrorStatusGroup_LastError(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify LastError() returns the correct error value", func(t *testing.T) {
 		assert.Equal(t, lastMessage, esg.LastError().Error())
@@ -306,17 +306,17 @@ func TestErrorStatusGroup_LastStatus(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify LastStatus() returns the correct status value", func(t *testing.T) {
-		assert.Equal(t, 3, esg.LastStatus())
+		assert.Equal(t, 300, esg.LastStatus())
 	})
 }
 
@@ -326,17 +326,17 @@ func TestErrorStatusGroup_LowestStatus(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify LowestStatus() returns the correct status value", func(t *testing.T) {
-		assert.Equal(t, 1, esg.LowestStatus())
+		assert.Equal(t, 100, esg.LowestStatus())
 	})
 }
 
@@ -346,20 +346,20 @@ func TestErrorStatusGroup_ToStatusAndError(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify output of ToStatusAndError() is correct", func(t *testing.T) {
 		var sb strings.Builder
-		sb.WriteString(fmt.Sprintf("lowest status: [%d]", 1))
+		sb.WriteString(fmt.Sprintf("lowest status: [%d]", 100))
 		sb.WriteString("\n")
-		sb.WriteString(fmt.Sprintf("highest status: [%d]", 3))
+		sb.WriteString(fmt.Sprintf("highest status: [%d]", 300))
 		sb.WriteString("\n")
 
 		var stringsToConcat []string
@@ -376,7 +376,7 @@ func TestErrorStatusGroup_ToStatusAndError(t *testing.T) {
 
 		statusCode, errVal := esg.ToStatusAndError()
 
-		assert.Equal(t, 3, statusCode)
+		assert.Equal(t, 300, statusCode)
 		assert.Equal(t, sb.String(), errVal.Error())
 	})
 }
@@ -387,20 +387,20 @@ func TestErrorStatusGroup_ToError(t *testing.T) {
 	middleMessage := "middle message"
 
 	esg := NewErrorStatusGroup()
-	esg.AddStatusAndError(1, errors.New(firstMessage))
+	esg.AddStatusAndError(100, errors.New(firstMessage))
 
 	numToAdd := 10
 	for i := 0; i < numToAdd; i++ {
-		esg.AddStatusAndError(2, errors.New(middleMessage))
+		esg.AddStatusAndError(200, errors.New(middleMessage))
 	}
 
-	esg.AddStatusAndError(3, errors.New(lastMessage))
+	esg.AddStatusAndError(300, errors.New(lastMessage))
 
 	t.Run("verify output of ToError() is correct", func(t *testing.T) {
 		var sb strings.Builder
-		sb.WriteString(fmt.Sprintf("lowest status: [%d]", 1))
+		sb.WriteString(fmt.Sprintf("lowest status: [%d]", 100))
 		sb.WriteString("\n")
-		sb.WriteString(fmt.Sprintf("highest status: [%d]", 3))
+		sb.WriteString(fmt.Sprintf("highest status: [%d]", 300))
 		sb.WriteString("\n")
 
 		var stringsToConcat []string

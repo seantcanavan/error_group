@@ -23,8 +23,8 @@ func NewErrorStatusGroup() *errorStatusGroup {
 
 	return &errorStatusGroup{
 		errorsMutex:   &errorMutex,
-		highestStatus: -1,
-		lowestStatus:  -1,
+		highestStatus: 200,
+		lowestStatus:  200,
 		statusesMutex: &statusMutex,
 	}
 }
@@ -44,19 +44,14 @@ func (esg *errorStatusGroup) AddError(err error) {
 // AddStatus adds a status to this error status group instance. Status values should be
 // 0 or greater. Negative status values will be ignored.
 func (esg *errorStatusGroup) AddStatus(status int) {
-	// we can't support negative numbers since -1 is our sentinel value for lowest and highest
-	if status < 0 {
-		return
-	}
-
 	esg.statusesMutex.Lock()
 	defer esg.statusesMutex.Unlock()
 
-	if status < esg.lowestStatus || esg.lowestStatus == -1 {
+	if status < esg.lowestStatus {
 		esg.lowestStatus = status
 	}
 
-	if status > esg.highestStatus || esg.highestStatus == -1 {
+	if status > esg.highestStatus {
 		esg.highestStatus = status
 	}
 
